@@ -12,12 +12,13 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/shiroemons/ent-gqlgen-todos"
 	"github.com/shiroemons/ent-gqlgen-todos/ent"
@@ -27,8 +28,13 @@ import (
 const defaultPort = "8080"
 
 func graphqlHandler(ctx context.Context) gin.HandlerFunc {
+	cfg, err := pgx.ParseConfig(os.Getenv("CONNECT_URL"))
+	if err != nil {
+		panic(err)
+	}
+
 	// Create ent.Client and run the schema migration.
-	client, err := ent.Open(dialect.SQLite, "file:ent?mode=memory&cache=shared&_fk=1")
+	client := ent.NewClient(ent.Driver(sql.OpenDB(dialect.Postgres, stdlib.OpenDB(*cfg))))
 	if err != nil {
 		log.Fatal("opening ent client", err)
 	}
