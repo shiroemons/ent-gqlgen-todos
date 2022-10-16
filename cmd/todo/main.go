@@ -23,9 +23,12 @@ func main() {
 	if err != nil {
 		log.Fatal("opening ent client", err)
 	}
+	ctx := context.Background()
 	if err := client.Schema.Create(
-		context.Background(),
+		ctx,
 		migrate.WithGlobalUniqueID(true),
+		migrate.WithDropIndex(true),
+		migrate.WithDropColumn(true),
 	); err != nil {
 		log.Fatal("opening ent client", err)
 	}
