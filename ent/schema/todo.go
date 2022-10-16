@@ -3,7 +3,9 @@ package schema
 import (
 	"time"
 
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -11,6 +13,13 @@ import (
 // Todo holds the schema definition for the Todo entity.
 type Todo struct {
 	ent.Schema
+}
+
+func (Todo) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+		entgql.Mutations(entgql.MutationCreate()),
+	}
 }
 
 // Fields of the Todo.
