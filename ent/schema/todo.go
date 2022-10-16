@@ -17,6 +17,7 @@ type Todo struct {
 
 func (Todo) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entgql.RelayConnection(),
 		entgql.QueryField(),
 		entgql.Mutations(entgql.MutationCreate()),
 	}
@@ -26,18 +27,30 @@ func (Todo) Annotations() []schema.Annotation {
 func (Todo) Fields() []ent.Field {
 	return []ent.Field{
 		field.Text("text").
-			NotEmpty(),
+			NotEmpty().
+			Annotations(
+				entgql.OrderField("TEXT"),
+			),
 		field.Time("created_at").
 			Default(time.Now).
-			Immutable(),
+			Immutable().
+			Annotations(
+				entgql.OrderField("CREATED_AT"),
+			),
 		field.Enum("status").
 			NamedValues(
 				"InProgress", "IN_PROGRESS",
 				"Completed", "COMPLETED",
 			).
-			Default("IN_PROGRESS"),
+			Default("IN_PROGRESS").
+			Annotations(
+				entgql.OrderField("STATUS"),
+			),
 		field.Int("priority").
-			Default(0),
+			Default(0).
+			Annotations(
+				entgql.OrderField("PRIORITY"),
+			),
 	}
 }
 

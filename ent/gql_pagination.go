@@ -438,6 +438,91 @@ func (t *TodoQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// TodoOrderFieldText orders Todo by text.
+	TodoOrderFieldText = &TodoOrderField{
+		field: todo.FieldText,
+		toCursor: func(t *Todo) Cursor {
+			return Cursor{
+				ID:    t.ID,
+				Value: t.Text,
+			}
+		},
+	}
+	// TodoOrderFieldCreatedAt orders Todo by created_at.
+	TodoOrderFieldCreatedAt = &TodoOrderField{
+		field: todo.FieldCreatedAt,
+		toCursor: func(t *Todo) Cursor {
+			return Cursor{
+				ID:    t.ID,
+				Value: t.CreatedAt,
+			}
+		},
+	}
+	// TodoOrderFieldStatus orders Todo by status.
+	TodoOrderFieldStatus = &TodoOrderField{
+		field: todo.FieldStatus,
+		toCursor: func(t *Todo) Cursor {
+			return Cursor{
+				ID:    t.ID,
+				Value: t.Status,
+			}
+		},
+	}
+	// TodoOrderFieldPriority orders Todo by priority.
+	TodoOrderFieldPriority = &TodoOrderField{
+		field: todo.FieldPriority,
+		toCursor: func(t *Todo) Cursor {
+			return Cursor{
+				ID:    t.ID,
+				Value: t.Priority,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f TodoOrderField) String() string {
+	var str string
+	switch f.field {
+	case todo.FieldText:
+		str = "TEXT"
+	case todo.FieldCreatedAt:
+		str = "CREATED_AT"
+	case todo.FieldStatus:
+		str = "STATUS"
+	case todo.FieldPriority:
+		str = "PRIORITY"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f TodoOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *TodoOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("TodoOrderField %T must be a string", v)
+	}
+	switch str {
+	case "TEXT":
+		*f = *TodoOrderFieldText
+	case "CREATED_AT":
+		*f = *TodoOrderFieldCreatedAt
+	case "STATUS":
+		*f = *TodoOrderFieldStatus
+	case "PRIORITY":
+		*f = *TodoOrderFieldPriority
+	default:
+		return fmt.Errorf("%s is not a valid TodoOrderField", str)
+	}
+	return nil
+}
+
 // TodoOrderField defines the ordering field of Todo.
 type TodoOrderField struct {
 	field    string

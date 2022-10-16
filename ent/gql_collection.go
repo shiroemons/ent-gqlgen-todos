@@ -75,6 +75,28 @@ func newTodoPaginateArgs(rv map[string]interface{}) *todoPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]interface{}:
+			var (
+				err1, err2 error
+				order      = &TodoOrder{Field: &TodoOrderField{}}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithTodoOrder(order))
+			}
+		case *TodoOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithTodoOrder(v))
+			}
+		}
+	}
 	return args
 }
 
