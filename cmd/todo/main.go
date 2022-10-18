@@ -20,9 +20,9 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
 
-	"github.com/shiroemons/ent-gqlgen-todos"
 	"github.com/shiroemons/ent-gqlgen-todos/ent"
 	"github.com/shiroemons/ent-gqlgen-todos/ent/migrate"
+	"github.com/shiroemons/ent-gqlgen-todos/graph"
 )
 
 const defaultPort = "8080"
@@ -48,7 +48,7 @@ func graphqlHandler(ctx context.Context) gin.HandlerFunc {
 		log.Fatal("opening ent client", err)
 	}
 
-	h := handler.NewDefaultServer(todo.NewSchema(client))
+	h := handler.NewDefaultServer(graph.NewSchema(client))
 	h.Use(entgql.Transactioner{TxOpener: client})
 
 	return func(c *gin.Context) {

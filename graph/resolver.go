@@ -1,4 +1,4 @@
-package todo
+package graph
 
 import (
 	"github.com/99designs/gqlgen/graphql"
